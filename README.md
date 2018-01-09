@@ -1,6 +1,7 @@
 DragList is gain drag events for all View elements
 
 There is below example in this repository in app module
+![Alt Text](https://github.com/nihatalim/DragList/raw/master/GenericRecyclerWithDragListExample.gif)
 
 Step 1: Installation
 
