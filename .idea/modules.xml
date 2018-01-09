@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DragList.iml" filepath="$PROJECT_DIR$/DragList.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dragmanagement/dragmanagement.iml" filepath="$PROJECT_DIR$/dragmanagement/dragmanagement.iml" />
     </modules>
   </component>
 </project>

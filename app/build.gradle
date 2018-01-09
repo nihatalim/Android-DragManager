@@ -29,4 +29,5 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.0.2'
     compile 'com.github.nihatalim:genericasyntask:v1.0'
     compile 'com.github.nihatalim:genericrecycler:v1.0.3'
+    implementation project(':dragmanagement')
 }

@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 
 import com.nihatalim.draglist.model.User;
 import com.nihatalim.draglist.view.UserHolder;
+import com.nihatalim.dragmanagement.business.DragManager;
+import com.nihatalim.dragmanagement.helpers.ViewData;
+import com.nihatalim.dragmanagement.interfaces.OnDrag;
 import com.nihatalim.genericrecycle.business.GenericRecycleAdapter;
 import com.nihatalim.genericrecycle.interfaces.OnBind;
 import com.nihatalim.genericrecycle.interfaces.OnCreate;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView1, recyclerView2;
     private GenericRecycleAdapter<UserHolder, User> recycleAdapter1, recycleAdapter2;
     private List<User> userList1, userList2;
+
+    private DragManager dragManager1 = null;
+    private DragManager dragManager2 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,48 @@ public class MainActivity extends AppCompatActivity {
         this.recycleAdapter1 = new GenericRecycleAdapter<>(this.userList1, getContext(), R.layout.user_item);
         this.recycleAdapter2 = new GenericRecycleAdapter<>(this.userList2, getContext(), R.layout.user_item);
 
+        // DragManager Initialize OnDrag
+        this.dragManager1 = DragManager.init(this.recyclerView2).OnDrag(new OnDrag<ViewData>() {
+            @Override
+            public void Drop(View view, DragEvent dragEvent, ViewData data) {
+                int position = (int) data.getData();
+                recycleAdapter2.getObjectList().add(recycleAdapter1.getObjectList().get(position));
+                recycleAdapter1.getObjectList().remove(position);
+                recycleAdapter1.notifyItemRemoved(position);
+                recycleAdapter2.notifyItemInserted(recycleAdapter2.getItemCount());
+            }
+
+            @Override
+            public void DragEntered(View view, DragEvent dragEvent, ViewData data) {
+                recyclerView1.setBackgroundColor(Color.CYAN);
+            }
+
+            @Override
+            public void DragExited(View view, DragEvent dragEvent, ViewData data) {
+                recyclerView1.setBackgroundColor(Color.BLUE);
+            }
+        });
+        this.dragManager2 = DragManager.init(this.recyclerView1).OnDrag(new OnDrag<ViewData>() {
+            @Override
+            public void Drop(View view, DragEvent dragEvent, ViewData data) {
+                int position = (int) data.getData();
+                recycleAdapter1.getObjectList().add(recycleAdapter2.getObjectList().get(position));
+                recycleAdapter2.getObjectList().remove(position);
+                recycleAdapter2.notifyItemRemoved(position);
+                recycleAdapter1.notifyItemInserted(recycleAdapter1.getItemCount());
+            }
+
+            @Override
+            public void DragEntered(View view, DragEvent dragEvent, ViewData data) {
+                recyclerView1.setBackgroundColor(Color.GREEN);
+            }
+
+            @Override
+            public void DragExited(View view, DragEvent dragEvent, ViewData data) {
+                recyclerView1.setBackgroundColor(Color.YELLOW);
+            }
+        });
+
         // OnCreate Interface field for recycleAdapter1
         this.recycleAdapter1.setOnCreateInterface(new OnCreate<UserHolder>() {
             @Override
@@ -51,10 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 view.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View view, MotionEvent motionEvent) {
-                        ClipData data = ClipData.newPlainText("", "");
-                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                        view.startDrag(data, shadowBuilder, holder.getPosition(), View.INVISIBLE);
-                        return true;
+                        return dragManager1.drag(view,holder.getPosition());
                     }
                 });
 
@@ -79,10 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 view.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View view, MotionEvent motionEvent) {
-                        ClipData data = ClipData.newPlainText("", "");
-                        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                        view.startDrag(data, shadowBuilder, holder.getPosition(), 0);
-                        return true;
+                        return dragManager2.drag(view,holder.getPosition());
                     }
                 });
 
@@ -98,51 +140,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // OnDragListener for recycler1
-        this.recyclerView1.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()) {
-                    case DragEvent.ACTION_DROP:
-                        int position = (int) dragEvent.getLocalState();
-                        recycleAdapter1.getObjectList().add(recycleAdapter2.getObjectList().get(position));
-                        recycleAdapter2.getObjectList().remove(position);
-                        recycleAdapter2.notifyItemRemoved(position);
-                        recycleAdapter1.notifyItemInserted(recycleAdapter1.getItemCount());
-                        break;
-
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        recyclerView1.setBackgroundColor(Color.CYAN);
-                        break;
-
-                    case DragEvent.ACTION_DRAG_EXITED:
-                        recyclerView1.setBackgroundColor(Color.GRAY);
-                        break;
-                }
-                return true;
-            }
-        });
-
-        // OnDragListener for recycler2
-        this.recyclerView2.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()) {
-                    case DragEvent.ACTION_DROP:
-                        int position = (int) dragEvent.getLocalState();
-                        recycleAdapter2.getObjectList().add(recycleAdapter1.getObjectList().get(position));
-                        recycleAdapter1.getObjectList().remove(position);
-                        recycleAdapter1.notifyItemRemoved(position);
-                        recycleAdapter2.notifyItemInserted(recycleAdapter2.getItemCount());
-                        break;
-                }
-                return true;
-            }
-        });
-
         // Generic Adapter Build recycler views
         this.recycleAdapter1.build(this.recyclerView1);
         this.recycleAdapter2.build(this.recyclerView2);
+
+        // Build DragManager
+        this.dragManager1.build();
+        this.dragManager2.build();
     }
 
     private List<User> fillList1() {
