@@ -1,9 +1,21 @@
 package com.nihatalim.dragmanagement.business;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.ClipData;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.DragEvent;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+import com.nihatalim.dragmanagement.R;
 import com.nihatalim.dragmanagement.helpers.ViewData;
 import com.nihatalim.dragmanagement.interfaces.OnDrag;
 
@@ -21,12 +33,14 @@ public class DragManager {
     private View TargetView = null;
     // OnDrag interface
     private OnDrag OnDrag = null;
+    // Technique for animate
+    private Techniques technique = null;
 
     private DragManager() {
         this.BaseViewDatas = new ArrayList<>();
         this.OnDrag = new OnDrag() {
             @Override
-            public void Drop(View view, DragEvent dragEvent, Object data) {
+            public void DragStarted(View view, DragEvent dragEvent, Object data) {
 
             }
 
@@ -36,7 +50,22 @@ public class DragManager {
             }
 
             @Override
+            public void DragLocation(View view, DragEvent dragEvent, Object data) {
+
+            }
+
+            @Override
             public void DragExited(View view, DragEvent dragEvent, Object data) {
+
+            }
+
+            @Override
+            public void Drop(View view, DragEvent dragEvent, Object data) {
+
+            }
+
+            @Override
+            public void DragEnded(View view, DragEvent dragEvent, Object data) {
 
             }
         };
@@ -70,7 +99,10 @@ public class DragManager {
         return true;
     }
 
-    public DragManager build() {
+    public DragManager build(Techniques... techniques) {
+        if(techniques.length>0){
+            this.technique = techniques[0];
+        }
         this.TargetView.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
@@ -92,6 +124,24 @@ public class DragManager {
 
                         case DragEvent.ACTION_DRAG_EXITED:
                             DragManager.this.OnDrag.DragExited(view, dragEvent, dragEvent.getLocalState());
+                            break;
+
+                        case DragEvent.ACTION_DRAG_ENDED:
+                            // Set visibility
+                            DragManager.this.OnDrag.DragEnded(view, dragEvent, dragEvent.getLocalState());
+                            localStateData.getBaseView().setVisibility(View.VISIBLE);
+                            break;
+
+                        case DragEvent.ACTION_DRAG_STARTED:
+                            // Set visibility
+                            DragManager.this.OnDrag.DragStarted(view, dragEvent, dragEvent.getLocalState());
+                            localStateData.getBaseView().setVisibility(View.INVISIBLE);
+                            // Animation
+                            if(technique!=null) YoYo.with(technique).duration(1000).playOn(view);
+                            break;
+
+                        case DragEvent.ACTION_DRAG_LOCATION:
+                            DragManager.this.OnDrag.DragLocation(view, dragEvent, dragEvent.getLocalState());
                             break;
                     }
                 }

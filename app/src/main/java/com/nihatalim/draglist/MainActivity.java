@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.daimajia.androidanimations.library.Techniques;
 import com.nihatalim.draglist.model.User;
 import com.nihatalim.draglist.view.UserHolder;
 import com.nihatalim.dragmanagement.business.DragManager;
@@ -60,16 +61,47 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            public void DragEnded(View view, DragEvent dragEvent, ViewData data) {
+
+            }
+
+            @Override
+            public void DragStarted(View view, DragEvent dragEvent, ViewData data) {
+
+            }
+
+            @Override
             public void DragEntered(View view, DragEvent dragEvent, ViewData data) {
-                recyclerView1.setBackgroundColor(Color.CYAN);
+            }
+
+            @Override
+            public void DragLocation(View view, DragEvent dragEvent, ViewData data) {
+
             }
 
             @Override
             public void DragExited(View view, DragEvent dragEvent, ViewData data) {
-                recyclerView1.setBackgroundColor(Color.BLUE);
             }
         });
         this.dragManager2 = DragManager.init(this.recyclerView1).OnDrag(new OnDrag<ViewData>() {
+            @Override
+            public void DragStarted(View view, DragEvent dragEvent, ViewData data) {
+
+            }
+
+            @Override
+            public void DragEntered(View view, DragEvent dragEvent, ViewData data) {
+            }
+
+            @Override
+            public void DragLocation(View view, DragEvent dragEvent, ViewData data) {
+
+            }
+
+            @Override
+            public void DragExited(View view, DragEvent dragEvent, ViewData data) {
+            }
+
             @Override
             public void Drop(View view, DragEvent dragEvent, ViewData data) {
                 int position = (int) data.getData();
@@ -80,13 +112,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void DragEntered(View view, DragEvent dragEvent, ViewData data) {
-                recyclerView1.setBackgroundColor(Color.GREEN);
-            }
+            public void DragEnded(View view, DragEvent dragEvent, ViewData data) {
 
-            @Override
-            public void DragExited(View view, DragEvent dragEvent, ViewData data) {
-                recyclerView1.setBackgroundColor(Color.YELLOW);
             }
         });
 
@@ -146,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Build DragManager
         this.dragManager1.build();
-        this.dragManager2.build();
+        this.dragManager2.build(Techniques.BounceInUp);
     }
 
     private List<User> fillList1() {

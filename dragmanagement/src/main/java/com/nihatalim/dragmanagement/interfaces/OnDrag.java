@@ -8,7 +8,10 @@ import android.view.View;
  */
 
 public interface OnDrag<T> {
-    public void Drop(View view, DragEvent dragEvent, T data);
+    public void DragStarted(View view, DragEvent dragEvent, T data);
     public void DragEntered(View view, DragEvent dragEvent, T data);
+    public void DragLocation(View view, DragEvent dragEvent, T data);
     public void DragExited(View view, DragEvent dragEvent, T data);
+    public void Drop(View view, DragEvent dragEvent, T data);
+    public void DragEnded(View view, DragEvent dragEvent, T data);
 }
