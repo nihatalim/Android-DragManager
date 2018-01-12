@@ -30,7 +30,7 @@ public class DragManager {
     // Base View Lists
     private List<ViewData> BaseViewDatas = null;
     // Drop to TargetView
-    private View TargetView = null;
+    private View[] TargetView = null;
     // OnDrag interface
     private OnDrag OnDrag = null;
     // Technique for animate
@@ -71,7 +71,7 @@ public class DragManager {
         };
     }
 
-    private DragManager(View target) {
+    private DragManager(View... target) {
         this();
         this.TargetView = target;
     }
@@ -80,7 +80,7 @@ public class DragManager {
         return new DragManager();
     }
 
-    public static DragManager init(View target) {
+    public static DragManager init(View... target) {
         return new DragManager(target);
     }
 
@@ -103,51 +103,54 @@ public class DragManager {
         if(techniques.length>0){
             this.technique = techniques[0];
         }
-        this.TargetView.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                ViewData localStateData = null;
-                try {
-                    localStateData = (ViewData) dragEvent.getLocalState();
-                } catch (ClassCastException ex) {
-                    return false;
-                }
-                if (localStateData != null && BaseViewDatas.contains(localStateData)) {
-                    switch (dragEvent.getAction()) {
-                        case DragEvent.ACTION_DROP:
-                            DragManager.this.OnDrag.Drop(view, dragEvent, dragEvent.getLocalState());
-                            break;
 
-                        case DragEvent.ACTION_DRAG_ENTERED:
-                            DragManager.this.OnDrag.DragEntered(view, dragEvent, dragEvent.getLocalState());
-                            break;
-
-                        case DragEvent.ACTION_DRAG_EXITED:
-                            DragManager.this.OnDrag.DragExited(view, dragEvent, dragEvent.getLocalState());
-                            break;
-
-                        case DragEvent.ACTION_DRAG_ENDED:
-                            // Set visibility
-                            DragManager.this.OnDrag.DragEnded(view, dragEvent, dragEvent.getLocalState());
-                            localStateData.getBaseView().setVisibility(View.VISIBLE);
-                            break;
-
-                        case DragEvent.ACTION_DRAG_STARTED:
-                            // Set visibility
-                            DragManager.this.OnDrag.DragStarted(view, dragEvent, dragEvent.getLocalState());
-                            localStateData.getBaseView().setVisibility(View.INVISIBLE);
-                            // Animation
-                            if(technique!=null) YoYo.with(technique).duration(1000).playOn(view);
-                            break;
-
-                        case DragEvent.ACTION_DRAG_LOCATION:
-                            DragManager.this.OnDrag.DragLocation(view, dragEvent, dragEvent.getLocalState());
-                            break;
+        for (View targetView:TargetView) {
+            targetView.setOnDragListener(new View.OnDragListener() {
+                @Override
+                public boolean onDrag(View view, DragEvent dragEvent) {
+                    ViewData localStateData = null;
+                    try {
+                        localStateData = (ViewData) dragEvent.getLocalState();
+                    } catch (ClassCastException ex) {
+                        return false;
                     }
+                    if (localStateData != null && BaseViewDatas.contains(localStateData)) {
+                        switch (dragEvent.getAction()) {
+                            case DragEvent.ACTION_DROP:
+                                DragManager.this.OnDrag.Drop(view, dragEvent, dragEvent.getLocalState());
+                                break;
+
+                            case DragEvent.ACTION_DRAG_ENTERED:
+                                DragManager.this.OnDrag.DragEntered(view, dragEvent, dragEvent.getLocalState());
+                                break;
+
+                            case DragEvent.ACTION_DRAG_EXITED:
+                                DragManager.this.OnDrag.DragExited(view, dragEvent, dragEvent.getLocalState());
+                                break;
+
+                            case DragEvent.ACTION_DRAG_ENDED:
+                                // Set visibility
+                                DragManager.this.OnDrag.DragEnded(view, dragEvent, dragEvent.getLocalState());
+                                localStateData.getBaseView().setVisibility(View.VISIBLE);
+                                break;
+
+                            case DragEvent.ACTION_DRAG_STARTED:
+                                // Set visibility
+                                DragManager.this.OnDrag.DragStarted(view, dragEvent, dragEvent.getLocalState());
+                                localStateData.getBaseView().setVisibility(View.INVISIBLE);
+                                // Animation
+                                if(technique!=null) YoYo.with(technique).duration(1000).playOn(view);
+                                break;
+
+                            case DragEvent.ACTION_DRAG_LOCATION:
+                                DragManager.this.OnDrag.DragLocation(view, dragEvent, dragEvent.getLocalState());
+                                break;
+                        }
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
+        }
         return this;
     }
 }
