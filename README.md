@@ -46,24 +46,34 @@ this.base.setOnLongClickListener(new View.OnLongClickListener() {
 });
 ```
 
-d) You can define drag actions. Only 3 supported actions but it will be adding next time.
+d) You can define drag actions. Fully supported actions now.
 
 ```
 this.dragManager.OnDrag(new OnDrag<ViewData>(){
+	@Override
+	public void Drop(View view, DragEvent dragEvent, ViewData data) {
+	}
 
 	@Override
-	public void Drop(View view, DragEvent dragEvent, ViewData viewData) {
+	public void DragEnded(View view, DragEvent dragEvent, ViewData data) {
 
 	}
 
 	@Override
-	public void DragEntered(View view, DragEvent dragEvent, ViewData viewData) {
+	public void DragStarted(View view, DragEvent dragEvent, ViewData data) {
+	}
+
+	@Override
+	public void DragEntered(View view, DragEvent dragEvent, ViewData data) {
+	}
+
+	@Override
+	public void DragLocation(View view, DragEvent dragEvent, ViewData data) {
 
 	}
 
 	@Override
-	public void DragExited(View view, DragEvent dragEvent, ViewData viewData) {
-
+	public void DragExited(View view, DragEvent dragEvent, ViewData data) {
 	}
 });
 
@@ -74,3 +84,11 @@ z) Finally you need to build your dragManager instance.
 ```
 this.dragManager.build();
 ```
+
+or you can pass an identifier to animating on target view like this:
+
+```
+this.dragManager.build(Techniques.BounceInUp);
+```
+
+you can take more animating from: https://github.com/daimajia/AndroidViewAnimations
